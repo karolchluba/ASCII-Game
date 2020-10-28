@@ -21,6 +21,7 @@ class WindowHandler
 {
 protected:
 	void gotoxy(int x, int y);
+	void clearCell(int x, int y);
 	void changeColor(int nameNumber);
 
 	virtual ~WindowHandler() {}

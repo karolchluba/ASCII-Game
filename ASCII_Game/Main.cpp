@@ -18,10 +18,10 @@ int main() {
 
 	// put first bullets on the board
 	for (auto cannon : gameManager->getCannons()) {
-		if(cannon->getShootDir() == 'D') gameManager->initBullet(cannon, 0, 1);
-		if(cannon->getShootDir() == 'U') gameManager->initBullet(cannon, 0, -1);
-		if(cannon->getShootDir() == 'R') gameManager->initBullet(cannon, 1, 0);
-		if(cannon->getShootDir() == 'L') gameManager->initBullet(cannon, -1, 0);
+		if(cannon->getShootDir() == 'D') cannon ->initBullet(0, 1, gameManager->getBoard(), std::bind(&GameManagement::checkIfCollision, gameManager, _1, _2, _3));
+		if(cannon->getShootDir() == 'U') cannon->initBullet(0, -1, gameManager->getBoard(), std::bind(&GameManagement::checkIfCollision, gameManager, _1, _2, _3));
+		if(cannon->getShootDir() == 'R') cannon->initBullet(1, 0, gameManager->getBoard(), std::bind(&GameManagement::checkIfCollision, gameManager, _1, _2, _3));
+		if(cannon->getShootDir() == 'L') cannon->initBullet(-1, 0, gameManager->getBoard(), std::bind(&GameManagement::checkIfCollision, gameManager, _1, _2, _3));
 
 	}
 

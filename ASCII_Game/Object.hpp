@@ -1,10 +1,20 @@
+#pragma once
+
 #include <windows.h>
 #include <iostream>
 
 #include "WindowHandler.hpp"
 
 using std::cout;
-#pragma once
+
+enum class CollisionState {
+	EMPTY_FIELD,
+	AT,
+	DEATH,
+	WALL
+};
+
+
 class Object : public WindowHandler
 {
 protected:

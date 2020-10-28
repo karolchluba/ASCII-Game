@@ -1,7 +1,7 @@
 #pragma once
-#include "Object.hpp"
+#include "ShootableObject.hpp"
 
-class Player : public Object
+class Player : public ShootableObject
 {
 private:
 	const int startxPos{ 2 }; // 2
@@ -10,8 +10,9 @@ private:
 	int timeDelay;
 	int xCheckpoint, yCheckpoint;
 	int health;
+
 public:
-	Player(int _timeDelay = 100000, int _xCheckpoint = 2, int _yCheckpoint = 36, int _xPos = 2, int _yPos = 36, int _health = 100);
+	Player(char _shootDir = 'U', int _shootDelay = 1000, int _timeDelay = 100000, int _xCheckpoint = 2, int _yCheckpoint = 36, int _xPos = 2, int _yPos = 36, int _health = 100);
 
 	int getStartxPos() const;
 	int getStartyPos() const;

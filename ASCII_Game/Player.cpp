@@ -1,7 +1,8 @@
 #include "Player.hpp"
 
-Player::Player(int _timeDelay, int _xCheckpoint, int _yCheckpoint, int _xPos, int _yPos, int _health) 
-	: Object{ _xPos, _yPos, char(24), char(24), true }, timeDelay{ _timeDelay }, xCheckpoint{ _xCheckpoint }, yCheckpoint{ _yCheckpoint }, health{_health}
+Player::Player(char _shootDir, int _shootDelay, int _timeDelay, int _xCheckpoint, int _yCheckpoint, int _xPos, int _yPos, int _health)
+	: ShootableObject{ _shootDir, _xPos, _yPos, _shootDelay, char(24), char(24), true }, 
+	timeDelay{ _timeDelay }, xCheckpoint{ _xCheckpoint }, yCheckpoint{ _yCheckpoint }, health{_health}
 {
 }
 

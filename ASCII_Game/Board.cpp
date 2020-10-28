@@ -23,7 +23,7 @@ void Board::readBoardASCII()
 
 }
 
-vector<string> Board::getBoardASCII()
+vector<string>& Board::getBoardASCII()
 {
 	return this->boardASCII;
 }

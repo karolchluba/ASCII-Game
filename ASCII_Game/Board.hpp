@@ -23,7 +23,7 @@ public:
 	Board();
 	void readBoardASCII();
 
-	vector<string> getBoardASCII();
+	vector<string>& getBoardASCII();
 	void modifyBoardASCII(int x, int y, char newElement);
 };
 

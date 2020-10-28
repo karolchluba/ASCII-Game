@@ -12,7 +12,9 @@
 #include "MovableObjectFactory.hpp"
 #include <memory>
 #include <stack>
+#include<functional>
 
+using namespace std::placeholders;
 using std::make_pair;
 using std::stack;
 using std::pair;
@@ -67,16 +69,12 @@ public:
 	void drawMovObjects();
 	void drawCheckpoints();
 
-	void clearCell(int xPos, int yPos);
 	void drawBoard();
 
 	// Player
 	void handleKeyboardInput();
 	void moveIntoNextField(int deltaX, int deltaY);
 	void movePlayer(int deltaX, int deltaY);
-	void moveBulletHorizontally(ShootableObject* cannon, int deltaX, int deltaY);
-	void moveBulletVertically(ShootableObject* cannon, int deltaX, int deltaY);
-	void handleShootableObjectBullet(ShootableObject* cannon, int xToHandle, int yToHandle, int deltaX, int deltaY);
 	void playerAttack();
 	void putPlayer();
 	void drawPlayer();
@@ -86,10 +84,7 @@ public:
 	bool checkIfCheckpoint(int newXPos, int newYPos);
 
 	//Cannons
-	void initBullet(ShootableObject* cannon, int deltaX, int deltaY);
 	void shootCannon(long long mcr);
-	void moveBullet(ShootableObject* cannon, int deltaX, int deltaY);
-	void drawBullet(int xPos, int yPos);
 
 	//Dollars
 	void moveObjects();

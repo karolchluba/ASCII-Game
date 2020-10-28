@@ -231,11 +231,6 @@ void GameManagement::killPlayer()
 	this->putPlayer();
 }
 
-void GameManagement::clearCell(int xPos, int yPos)
-{
-	gotoxy(xPos, yPos);
-	cout << ' ';
-}
 
 void GameManagement::drawBoard() {
 	gotoxy(0, 0);
@@ -292,7 +287,7 @@ void GameManagement::handleKeyboardInput()
 		movePlayer(0, 1);
 	}
 	else if (GetKeyState(VK_SPACE) & 0x8000) {
-		movePlayer(0, 1);
+		//this->player->shoot();
 	}
 }
 
@@ -323,9 +318,6 @@ void GameManagement::movePlayer(int deltaX, int deltaY)
 
 	if (this->checkIfCollision(xPos + deltaX, yPos + deltaY, 'p') == CollisionState::EMPTY_FIELD) { // player on the wall
 		this->moveIntoNextField(deltaX, deltaY);			
-	}
-	else if (this->checkIfCollision(xPos + deltaX, yPos + deltaY, 'p') == CollisionState::DEATH) { // player's death
-		this->killPlayer();
 	}
 	else if (this->checkIfCollision(xPos + deltaX, yPos + deltaY, 'p') == CollisionState::AT) { // next field contains at
 		vector<Object*>::iterator it = this->findAt(xPos + deltaX, yPos + deltaY);
@@ -369,7 +361,9 @@ CollisionState GameManagement::checkIfCollision(int newXPos, int newYPos, char c
 		(boardASCII.at(newYPos).at(newXPos) == '$' && currType != '$') || 
 		(boardASCII.at(newYPos).at(newXPos) == '%' && currType != '%')) {
 
-		return CollisionState::DEATH; // player's death 
+		killPlayer(); 
+
+		return CollisionState::DEATH;
 	}
 	if (boardASCII.at(newYPos).at(newXPos) == '@') {
 		return CollisionState::AT; // for at
@@ -387,97 +381,9 @@ bool GameManagement::checkIfCheckpoint(int newXPos, int newYPos)
 	return false;
 }
 
-void GameManagement::handleShootableObjectBullet(ShootableObject* cannon, int xToHandle, int yToHandle, int deltaX, int deltaY) {
-	auto modifyBoardAndScreen = [this, xToHandle, yToHandle, deltaX, deltaY]() mutable {
-		this->board->modifyBoardASCII(xToHandle, yToHandle, ' ');
-		this->board->modifyBoardASCII(xToHandle + deltaX, yToHandle + deltaY, 'o');
-
-		this->clearCell(xToHandle, yToHandle);
-		this->drawBullet(xToHandle + deltaX, yToHandle + deltaY);
-	};
-
-	if (checkIfCollision(xToHandle + deltaX, yToHandle + deltaY, 'o') == CollisionState::EMPTY_FIELD) {
-		modifyBoardAndScreen();
-	}
-	else if (checkIfCollision(xToHandle + deltaX, yToHandle + deltaY, 'o') == CollisionState::DEATH) {
-		this->killPlayer();
-
-		modifyBoardAndScreen();
-	}
-	else if ((checkIfCollision(xToHandle + deltaX, yToHandle + deltaY, 'o') == CollisionState::WALL ||
-		checkIfCollision(xToHandle + deltaX, yToHandle + deltaY, 'o') == CollisionState::AT)) {
-		
-		this->board->modifyBoardASCII(xToHandle, yToHandle, ' ');
-		this->clearCell(xToHandle, yToHandle);
-		this->initBullet(cannon, deltaX, deltaY);
-
-		this->drawBullet(cannon->getXPos() + deltaX, cannon->getYPos() + deltaY);
-	}
-}
-
-void GameManagement::moveBulletVertically(ShootableObject* cannon, int deltaX, int deltaY) {
-	vector<string> boardASCII = this->board->getBoardASCII();
-
-	int y;
-	for (y = cannon->getYPos() + deltaY; boardASCII.at(y).at(cannon->getXPos()) != 'o'; y += deltaY) {
-		if (boardASCII.at(y).at(cannon->getXPos()) == '#') {
-			this->initBullet(cannon, deltaX, deltaY);
-			return;
-		}
-	}
-
-	handleShootableObjectBullet(cannon, cannon->getXPos(), y, deltaX, deltaY);
-}
-
-void GameManagement::moveBulletHorizontally(ShootableObject* cannon, int deltaX, int deltaY) {
-	vector<string> boardASCII = this->board->getBoardASCII();
-
-	int x = cannon->getXPos() + deltaX;
-	while (boardASCII.at(cannon->getYPos()).at(x) != 'o') {
-		if (boardASCII.at(cannon->getYPos()).at(x) == '#') {
-			this->initBullet(cannon, deltaX, deltaY);
-			return;
-		}
-
-		x += deltaX;
-	}
-
-	handleShootableObjectBullet(cannon, x, cannon->getYPos(), deltaX, deltaY);	
-}
-
-void GameManagement::moveBullet(ShootableObject* cannon, int deltaX, int deltaY)
-{
-	// Move Vertically
-	if (deltaY != 0 && deltaX == 0) {
-		moveBulletVertically(cannon, deltaX, deltaY);
-	}
-	// Move Horizontally
-	else if (deltaX != 0 && deltaY == 0) {
-		moveBulletHorizontally(cannon, deltaX, deltaY);
-	}
-}
-
-void GameManagement::drawBullet(int xPos, int yPos) {
-	this->changeColor(RED);
-	this->gotoxy(xPos, yPos);
-
-	cout << this->shootableObjects.at(0)->getReprBullet();
-	this->changeColor(WHITE);
-}
-
-
-void GameManagement::initBullet(ShootableObject* cannon, int xMove, int yMove) {
-	if (checkIfCollision(cannon->getXPos() + xMove, cannon->getYPos() + yMove, 'o') == CollisionState::EMPTY_FIELD) {
-		this->board->modifyBoardASCII(cannon->getXPos() + xMove, cannon->getYPos() + yMove, 'o');
-	}
-}
-
 void GameManagement::shootCannon(long long mcr) {
-	for (auto cannon : this->shootableObjects) {
-		if (cannon->getShootDir() == 'D' && cannon->getShootDelay() == mcr) { this->moveBullet(cannon, 0, 1); }
-		else if (cannon->getShootDir() == 'U' && cannon->getShootDelay() == mcr) { this->moveBullet(cannon, 0, -1); }
-		else if ( cannon->getShootDir() == 'R' && cannon->getShootDelay() == mcr) { this->moveBullet(cannon, 1, 0); }
-		else if (cannon->getShootDir() == 'L' && cannon->getShootDelay() == mcr) { this->moveBullet(cannon, -1, 0); }
+	for (const auto& cannon : this->shootableObjects) { 
+		cannon->handleBullet(mcr, this->board, std::bind(&GameManagement::checkIfCollision, this,  _1, _2, _3));		
 	}
 }
 
@@ -514,9 +420,6 @@ void GameManagement::moveObjects()
 
 			if (this->checkIfCollision(xPos + object->getXDir(), yPos + object->getYDir(), object->getRepr()) == CollisionState::WALL) { // wall is next
 				object->setXDir(object->getXDir() * (-1));
-			}
-			else if (this->checkIfCollision(xPos + object->getXDir(), yPos + object->getYDir(), object->getRepr()) == CollisionState::DEATH) {
-				this->killPlayer();
 			}
 
 			object->moveObject();

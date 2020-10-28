@@ -8,6 +8,11 @@ void WindowHandler::gotoxy(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+void WindowHandler::clearCell(int x, int y) {
+	gotoxy(x, y);
+	std::cout << ' ';
+}
+
 void WindowHandler::changeColor(int nameNumber){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	switch (nameNumber) {

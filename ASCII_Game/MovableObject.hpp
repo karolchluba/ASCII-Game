@@ -1,12 +1,5 @@
 #include "Object.hpp"
 
-enum class CollisionState {
-	EMPTY_FIELD,
-	AT,
-	DEATH,
-	WALL
-};
-
 #pragma once
 class MovableObject : public Object
 {
