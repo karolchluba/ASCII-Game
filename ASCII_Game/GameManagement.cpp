@@ -286,9 +286,6 @@ void GameManagement::handleKeyboardInput()
 	else if (GetKeyState('S') & 0x8000) {
 		movePlayer(0, 1);
 	}
-	else if (GetKeyState(VK_SPACE) & 0x8000) {
-		//this->player->shoot();
-	}
 }
 
 void GameManagement::moveIntoNextField(int deltaX, int deltaY) {
@@ -381,9 +378,10 @@ bool GameManagement::checkIfCheckpoint(int newXPos, int newYPos)
 	return false;
 }
 
-void GameManagement::shootCannon(long long mcr) {
+void GameManagement::handleBullets(long long mcr) {
 	for (const auto& cannon : this->shootableObjects) { 
-		cannon->handleBullet(mcr, this->board, std::bind(&GameManagement::checkIfCollision, this,  _1, _2, _3));		
+		if(mcr == cannon->getShootDelay())
+			cannon->handleBullet(this->board, std::bind(&GameManagement::checkIfCollision, this,  _1, _2, _3));		
 	}
 }
 

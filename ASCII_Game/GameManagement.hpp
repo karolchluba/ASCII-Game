@@ -84,7 +84,7 @@ public:
 	bool checkIfCheckpoint(int newXPos, int newYPos);
 
 	//Cannons
-	void shootCannon(long long mcr);
+	void handleBullets(long long mcr);
 
 	//Dollars
 	void moveObjects();

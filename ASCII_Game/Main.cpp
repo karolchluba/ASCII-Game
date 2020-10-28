@@ -42,8 +42,8 @@ int main() {
 	while (true) {
 		long long mcr = duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 		if(!(mcr % gameManager->getPlayer()->getTimeDelay())) gameManager->handleKeyboardInput();
-		if(!(mcr % timeDelay::CANNON_SLOW)) gameManager->shootCannon(timeDelay::CANNON_SLOW);
-		if(!(mcr % timeDelay::CANNON_FAST)) gameManager->shootCannon(timeDelay::CANNON_FAST);
+		if(!(mcr % timeDelay::CANNON_SLOW)) gameManager->handleBullets(timeDelay::CANNON_SLOW);
+		if(!(mcr % timeDelay::CANNON_FAST)) gameManager->handleBullets(timeDelay::CANNON_FAST);
 		if (!(mcr % timeDelay::MOVABLE_OBJECT)) {
 			gameManager->moveObjects();
 			

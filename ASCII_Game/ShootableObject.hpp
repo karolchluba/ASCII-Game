@@ -5,25 +5,32 @@
 class ShootableObject : public Object
 {
 private:
-	char reprBullet{'o'};
-	char shootDir;
-	int shootDelay;
+	bool _isBulletRespawning;
+	char _reprBullet{'o'};
+	char _shootDir;
+	int _shootDelay;
 
 public:
-	ShootableObject(char _shootDir, int _xPos, int _yPos, int _shootDelay, char _reprVer, char _reprHor, bool _isVer) : Object{ _xPos, _yPos, _reprVer, _reprHor, _isVer }, shootDelay{_shootDelay}, shootDir{ _shootDir } {}
+	ShootableObject(char _shootDir, int _xPos, int _yPos, int _shootDelay, char _reprVer, char _reprHor, bool _isVer, bool isBulletRespawning) : Object{ _xPos, _yPos, _reprVer, _reprHor, _isVer }, 
+		_shootDelay{ _shootDelay }, _shootDir{ _shootDir }, _isBulletRespawning{isBulletRespawning} {
+	
+	}
+
 	virtual ~ShootableObject() {}
 
-	void handleBullet(long long mcr, Board* board, std::function<CollisionState(int, int, char)> checkIfCollision) {
-		if (this->shootDir == 'D' && this->shootDelay == mcr) {
+	void handleBullet(Board* board, std::function<CollisionState (int, int, char)> checkIfCollision) {
+		
+		
+		if (this->_shootDir == 'D') {
 			moveBulletVertically(0, 1, board, checkIfCollision);
 		}
-		else if (this->shootDir == 'U' && this->shootDelay == mcr) {
+		else if (this->_shootDir == 'U') {
 			moveBulletVertically(0, -1, board, checkIfCollision);
 		}
-		else if (this->shootDir == 'R' && this->shootDelay == mcr) {
+		else if (this->_shootDir == 'R') {
 			moveBulletHorizontally(1, 0, board, checkIfCollision);
 		}
-		else if (this->shootDir == 'L' && this->shootDelay == mcr) {
+		else if (this->_shootDir == 'L') {
 			moveBulletHorizontally(-1, 0, board, checkIfCollision);
 		}
 	}
@@ -34,13 +41,19 @@ public:
 		}
 	}
 
+
+
 	void moveBulletVertically(int deltaX, int deltaY, Board* board, std::function<CollisionState(int, int, char)> checkIfCollision) {
-		int y;
-		for (y = this->getYPos() + deltaY; board->getBoardASCII().at(y).at(this->getXPos()) != 'o'; y += deltaY) {
-			if (board->getBoardASCII().at(y).at(this->getXPos()) == '#') {
+		int y = this->getYPos() + deltaY;
+		while (board->getBoardASCII().at(y).at(this->getXPos()) != 'o') {
+			if (board->getBoardASCII().at(y).at(this->getXPos()) == '#' && this->_isBulletRespawning) {
 				this->initBullet(deltaX, deltaY, board, checkIfCollision);
 				return;
 			}
+			else if (board->getBoardASCII().at(y).at(this->getXPos()) == '#' && !this->_isBulletRespawning) {
+				return;
+			}
+			y += deltaY;
 		}
 
 		handleCollision(this->getXPos(), y, deltaX, deltaY, board, checkIfCollision);
@@ -49,8 +62,11 @@ public:
 	void moveBulletHorizontally(int deltaX, int deltaY, Board* board, std::function<CollisionState(int, int, char)> checkIfCollision) {
 		int x = this->getXPos() + deltaX;
 		while (board->getBoardASCII().at(this->getYPos()).at(x) != 'o') {
-			if (board->getBoardASCII().at(this->getYPos()).at(x) == '#') {
+			if (board->getBoardASCII().at(this->getYPos()).at(x) == '#' && this->_isBulletRespawning) {
 				this->initBullet(deltaX, deltaY, board, checkIfCollision);
+				return;
+			}
+			else if (board->getBoardASCII().at(this->getYPos()).at(x) == '#' && !this->_isBulletRespawning) {
 				return;
 			}
 
@@ -80,7 +96,6 @@ public:
 
 			board->modifyBoardASCII(xToHandle, yToHandle, ' ');
 			this->clearCell(xToHandle, yToHandle);
-			this->initBullet(deltaX, deltaY, board, checkIfCollision);
 
 			this->drawBullet(this->xPos + deltaX, this->yPos + deltaY);
 		}
@@ -91,14 +106,15 @@ public:
 		this->changeColor(RED);
 		this->gotoxy(xPos, yPos);
 
-		cout << this->reprBullet;
+		cout << this->_reprBullet;
 		this->changeColor(WHITE);
 	}
 
-	void drawBullet() { cout << this->reprBullet;  }
-	char getReprBullet() { return this->reprBullet; }
-	char getShootDir() { return this->shootDir;  }
+	void drawBullet() { cout << this->_reprBullet;  }
+	char getReprBullet() const { return this->_reprBullet; }
 
-	int getShootDelay() { return this->shootDelay;  }
+	char getShootDir() const { return this->_shootDir;  }
+	void setShootDir(char shootDir) { this->_shootDir = shootDir; }
+	int getShootDelay() const { return this->_shootDelay;  }
 };
 
